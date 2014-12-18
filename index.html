@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title></title>
+</head>
+<body>
+<script type="text/javascript" src="jquery.js"></script>
+<script type="text/javascript">
+
+var app = {
+
+  init: function() {
+    var arena = app.arena.init();
+    var snake = app.snake.init();
+
+    arena.addSnake(snake);
+    
+    // var interval_id = setInterval(function() {
+
+      app.display.render( arena );
+    // }, 1000);
+  },
+
+  snake: {
+    length: 1,
+    lastPosition: [50, 50],
+    init: function( ) {
+      console.log(this.lastPosition[0])
+      return this;
+    },
+    getX: function() {
+      return this.lastPosition[0];
+    },
+    getY: function() {
+      return this.lastPosition[1];
+    },
+    setPosition: function(coordinates) {
+      this.lastPosition = coordinates;
+    }
+  },
+
+  arena: {
+    height: 100,
+    width: 100,
+    matrica: [],
+    snake: null,
+    init: function() {
+      // this.height = height;
+      // this.width = width;
+
+      this.matrica = this.generateMatrica();
+
+      return this;
+    },
+    addSnake: function(snake) {
+      this.snake = snake;
+
+      var x = snake.getX();
+      var y = snake.getY();
+
+      this.matrica[y][x] = 1;
+
+
+    },
+    generateMatrica: function() {
+      var matrica = [];
+
+      for (var y = 0; y < this.height; y++) {
+        matrica[y] = [];
+        for (var x = 0; x < this.width; x++) {
+          matrica[y][x] = 0;
+        };
+      };
+      console.log(matrica);
+      return this.matrica = matrica;
+    },
+  },
+
+  display: {
+    renderArena: function( arena ) {
+      // Create the canvas
+      var canvas = document.createElement("canvas");
+      var ctx = canvas.getContext("2d");
+      canvas.width = arena.height;
+      canvas.height = arena.width;
+      document.body.appendChild(canvas);
+
+      // Add snake
+      ctx.rect(arena.snake.getX(), arena.snake.getY(), 10, 10);
+      ctx.fillStyle = 'green';
+      ctx.fill();
+      ctx.lineWidth = 2;
+      ctx.strokeStyle = 'black';
+      ctx.stroke();
+    },
+    render: function( arena ) {
+      this.renderArena(arena);
+    },
+  },
+}
+
+$(function() {
+
+  app.init();
+
+});
+
+</script>
+
+<table class="arena"></table>
+
+</body>
+</html>
