@@ -6,7 +6,9 @@ var app = {
 
     arena.addSnake(snake); 
     
+    // Detect keyboard events.
     app.input.setEvents();
+
     var interval_id = setInterval(function() {
       // console.log(snake.coordinates);
 
@@ -15,7 +17,11 @@ var app = {
       // console.log(snake.coordinates);
 
       app.display.render( arena );
-    }, 200);
+
+      // if snake eat apple
+        // then snake length plus one
+
+    }, 130);
   },
 
   input: {
@@ -41,7 +47,7 @@ var app = {
   },
 
   snake: {
-    length: 5,
+    length: 3,
     coordinates: {x: 100, y: 100},
     speed: 10,
     history: [],
