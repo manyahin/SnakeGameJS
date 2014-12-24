@@ -40,8 +40,8 @@ var app = {
 
   snake: {
     length: 1,
-    coordinates: {x: 50, y: 50},
-    speed: 14,
+    coordinates: {x: 15, y: 15},
+    speed: 1,
     init: function( ) {
       return this;
     },
@@ -77,8 +77,8 @@ var app = {
   },
 
   arena: {
-    height: 200,
-    width: 200,
+    height: 30,
+    width: 50,
     matrica: [],
     snake: null,
     init: function() {
@@ -120,7 +120,6 @@ var app = {
       // Create the canvas
       if (this.canvas.toString() 
         != "[object HTMLCanvasElement]") {
-        console.log('nothing');
         this.canvas = document.createElement("canvas");
         this.canvas.style.border = "3px solid black";
         this.ctx = this.canvas.getContext("2d");
@@ -129,23 +128,58 @@ var app = {
         document.body.appendChild(this.canvas);
       }
 
-      // Clear canvas
-      this.ctx.clearRect(0, 0, this.canvas.height, this.canvas.width);
-
-      // Add snake
-      this.ctx.rect(arena.snake.getX(), arena.snake.getY(), 10, 10);
-      this.ctx.fillStyle = 'green';
+      // console.log(this.ctx)
+      // Paint it black.
+      this.ctx.fillStyle = "black";
+      this.ctx.rect(0, 0, arena.width, arena.height);
       this.ctx.fill();
-      this.ctx.lineWidth = 2;
-      this.ctx.strokeStyle = 'black';
-      this.ctx.stroke();
+
+      // Save the initial background.
+      this.back = this.ctx.getImageData(0, 0, 30, 30);
+
     },
     renderHtmlTable: function( arena ) {
+      $('.arena').html(' ');
 
+      var table = $('<table>')
+          .css('border','1px solid black');
+      
+      for (y = 1; y <= arena.height; y++) {
+          var tr = $('<tr>');
+          for (x = 1; x <= arena.width; x++) {
+              var td = $('<td>')
+                  .attr('data-x',x)
+                  .attr('data-y',y)
+
+                  .html('');
+              
+              tr.append(td);   
+          }
+          table.append(tr);
+      }
+      
+      $('.arena').append(table);
+    },
+    markPixel: function(x, y) {
+      $('[data-x="'+x+'"][data-y="'+y+'"]').css('background-color', 'green');
     },
     render: function( arena ) {
-      this.renderCanvas(arena);
+      // HTML
+      // this.renderHtmlTable( arena );
+      // this.markPixel(arena.snake.getX(), arena.snake.getY());
+
+      // HTML Canvas
+      this.renderCanvas( arena );
+      this.renderPixel(arena, arena.snake.coordinates);
     },
+    renderPixel: function( arena, coordinates ) {
+      this.ctx.rect(coordinates.x, coordinates.y, 10, 10);
+      this.ctx.fillStyle = 'green';
+      this.ctx.fill();      
+    },
+    clearCanvas: function( arena ) {
+      
+    }
   },
 }
 
