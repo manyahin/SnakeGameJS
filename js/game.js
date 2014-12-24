@@ -41,7 +41,7 @@ var app = {
   snake: {
     length: 1,
     coordinates: {x: 15, y: 15},
-    speed: 1,
+    speed: 10,
     init: function( ) {
       return this;
     },
@@ -77,8 +77,8 @@ var app = {
   },
 
   arena: {
-    height: 30,
-    width: 50,
+    height: 500,
+    width: 500,
     matrica: [],
     snake: null,
     init: function() {
@@ -128,14 +128,19 @@ var app = {
         document.body.appendChild(this.canvas);
       }
 
+      this.ctx.clearRect(0, 0, arena.width, arena.width);
+      // color in the background
+      this.ctx.fillStyle = "black";
+      this.ctx.fillRect(0, 0, arena.width, arena.width);
+
       // console.log(this.ctx)
       // Paint it black.
-      this.ctx.fillStyle = "black";
+      this.ctx.fillStyle = "#FFBB22";
       this.ctx.rect(0, 0, arena.width, arena.height);
       this.ctx.fill();
 
       // Save the initial background.
-      this.back = this.ctx.getImageData(0, 0, 30, 30);
+      // this.back = this.ctx.getImageData(0, 0, 30, 30);
 
     },
     renderHtmlTable: function( arena ) {
@@ -173,7 +178,11 @@ var app = {
       this.renderPixel(arena, arena.snake.coordinates);
     },
     renderPixel: function( arena, coordinates ) {
+      this.ctx.beginPath();
+
       this.ctx.rect(coordinates.x, coordinates.y, 10, 10);
+      this.ctx.closePath();
+
       this.ctx.fillStyle = 'green';
       this.ctx.fill();      
     },
