@@ -8,9 +8,11 @@ var app = {
     
     app.input.setEvents();
     var interval_id = setInterval(function() {
-      console.log(snake.coordinates);
+      // console.log(snake.coordinates);
 
       snake.move();
+
+      // console.log(snake.coordinates);
 
       app.display.render( arena );
     }, 200);
@@ -39,10 +41,14 @@ var app = {
   },
 
   snake: {
-    length: 1,
-    coordinates: {x: 15, y: 15},
+    length: 5,
+    coordinates: {x: 100, y: 100},
     speed: 10,
+    history: [],
     init: function( ) {
+      // Safe first snake coordinate in history. 
+      this.history.push(this.coordinates);
+
       return this;
     },
     getX: function() {
@@ -73,6 +79,17 @@ var app = {
             this.coordinates.x - this.speed;
           break;
       }
+
+      // Hack, push every time new object to history.
+      this.history.push({x: this.getX(), y: this.getY()});
+
+      // Remove not used coordinates.
+      if (this.history.length > this.length) {
+        this.history.shift();
+      }
+    },
+    getCoordinates: function() {
+      return this.history;
     },
   },
 
@@ -175,7 +192,21 @@ var app = {
 
       // HTML Canvas
       this.renderCanvas( arena );
-      this.renderPixel(arena, arena.snake.coordinates);
+
+      // Render snake.
+      snakeCoordinates = arena.snake.getCoordinates();
+      for (var i = 0; i < snakeCoordinates.length; i++) {
+        
+        this.renderPixel(arena, snakeCoordinates[i]);
+      };
+
+      // this.arena.snake.history.each(function(i, el) {
+      //   console.log(i, el)
+      // })
+
+      // this.renderPixel(arena, arena.snake.coordinates);
+      // this.renderPixel(arena, {x: arena.snake.coordinates.x + 10, 
+      //   y: arena.snake.coordinates.y});
     },
     renderPixel: function( arena, coordinates ) {
       this.ctx.beginPath();
