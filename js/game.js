@@ -8,12 +8,17 @@ var app = {
     var snake = app.snake.init();
 
     arena.addSnake(snake); 
+
+    var apple = app.apple.init();
+
+    arena.addApple(apple);
     
     app.game.start(arena);
   },
 
   game: {
     intervalId: null,
+    score: 0,
     start: function(arena) {
       app.game.intervalId = setInterval(function() {
         arena.snake.move();
@@ -33,9 +38,15 @@ var app = {
         // Render display
         app.display.render( app.arena );
 
-        // if snake eat apple
-        // then snake length plus one
+        // Check if snake eat apple
+        if (JSON.stringify(app.snake.getCoordinates()) == JSON.stringify(app.apple.getCoordinates()))
+        {
+          this.scrore++;
+          app.snake.length++;
 
+          // Put new apple on arena
+          app.apple.generateNewCoordinates();
+        }
       }, 130);
     },
     stop: function(intevalId) {
@@ -70,6 +81,28 @@ var app = {
         }
       }, false);
     },
+  },
+
+  apple: {
+    coordinates: null, // {x: 10, y: 20}
+    init: function() {
+      // Generate coordinates for first apple
+      app.apple.generateNewCoordinates();
+
+      return this;
+    },
+    setCoordinates: function( coordinates ) {
+      this.coordinates = coordinates;
+    },
+    getCoordinates: function() {
+      return this.coordinates;
+    },
+    generateNewCoordinates: function() {
+      app.apple.setCoordinates({
+        x: (Math.round(Math.random() * (app.arena.getWidth() / 10)) + 1) * 10,
+        y: (Math.round(Math.random() * (app.arena.getHeight() / 10)) + 1) * 10
+      });
+    }
   },
 
   snake: {
@@ -120,9 +153,12 @@ var app = {
         this.history.shift();
       }
     },
-    getCoordinates: function() {
+    getHistory: function() {
       return this.history;
     },
+    getCoordinates: function() {
+      return this.coordinates;
+    }
   },
 
   arena: {
@@ -130,6 +166,7 @@ var app = {
     width: 250,
     matrica: [],
     snake: null,
+    apple: null,
     init: function() {
       // this.height = height;
       // this.width = width;
@@ -151,8 +188,11 @@ var app = {
       var y = snake.getY();
 
       this.matrica[y][x] = 1;
-
-
+    },
+    addApple: function(apple) {
+      this.apple = apple;
+      var coordinates = this.apple.getCoordinates();
+      this.matrica[coordinates.y][coordinates.x] = 1;
     },
     generateMatrica: function() {
       var matrica = [];
@@ -231,12 +271,17 @@ var app = {
       // HTML Canvas
       this.renderCanvas( arena );
 
+      // Render apple first
+      appleCoordinates = arena.apple.getCoordinates();
+      this.renderPixel(arena, appleCoordinates, 'red')
+
       // Render snake.
-      snakeCoordinates = arena.snake.getCoordinates();
+      snakeCoordinates = arena.snake.getHistory();
       for (var i = 0; i < snakeCoordinates.length; i++) {
-        this.renderPixel(arena, snakeCoordinates[i]);
+        this.renderPixel(arena, snakeCoordinates[i], 'green');
       };
 
+      
       // this.arena.snake.history.each(function(i, el) {
       //   console.log(i, el)
       // })
@@ -245,13 +290,13 @@ var app = {
       // this.renderPixel(arena, {x: arena.snake.coordinates.x + 10, 
       //   y: arena.snake.coordinates.y});
     },
-    renderPixel: function( arena, coordinates ) {
+    renderPixel: function( arena, coordinates, color ) {
       this.ctx.beginPath();
 
       this.ctx.rect(coordinates.x, coordinates.y, 10, 10);
       this.ctx.closePath();
 
-      this.ctx.fillStyle = 'green';
+      this.ctx.fillStyle = color;
       this.ctx.fill();      
     },
     clearCanvas: function( arena ) {
