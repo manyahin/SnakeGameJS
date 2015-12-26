@@ -1,27 +1,49 @@
 var app = {
 
   init: function() {
+    // Detect keyboard events.
+    app.input.setEvents();
+
     var arena = app.arena.init();
     var snake = app.snake.init();
 
     arena.addSnake(snake); 
     
-    // Detect keyboard events.
-    app.input.setEvents();
+    app.game.start(arena);
+  },
 
-    var interval_id = setInterval(function() {
-      // console.log(snake.coordinates);
+  game: {
+    intervalId: null,
+    start: function(arena) {
+      app.game.intervalId = setInterval(function() {
+        arena.snake.move();
 
-      snake.move();
+        // Check if snake over board
+        // Minus one pixel from border. One graph pixel is 10 pixels.
+        if (
+          arena.snake.getX() <= 0 || arena.snake.getX() >= arena.getWidth() - 1 * 10 || 
+          arena.snake.getY() <= 0 || arena.snake.getY() >= arena.getHeight() - 1 * 10
+          )
+        {
+          // Game end
+          app.game.stop(app.game.intervalId);
+          // app.game.restart(arena);
+        }
 
-      // console.log(snake.coordinates);
+        // Render display
+        app.display.render( app.arena );
 
-      app.display.render( arena );
-
-      // if snake eat apple
+        // if snake eat apple
         // then snake length plus one
 
-    }, 130);
+      }, 130);
+    },
+    stop: function(intevalId) {
+      clearInterval(intevalId);
+    },
+    restart: function(arena) {
+      arena.snake.setPosition({x: 100, y: 100});
+    }
   },
 
   input: {
@@ -30,16 +52,20 @@ var app = {
       addEventListener('keydown', function(e) {
         switch(e.keyCode) {
           case 38: 
-            app.input.direction = "up";
+            if (app.input.direction != "down")
+              app.input.direction = "up";
             break;
           case 39: 
-            app.input.direction = "right";
+            if (app.input.direction != "left")
+              app.input.direction = "right";
             break;
           case 40:
-            app.input.direction = "down";
+            if (app.input.direction != "up")
+              app.input.direction = "down";
             break;
           case 37:
-            app.input.direction = "left";
+            if (app.input.direction != "right")  
+              app.input.direction = "left";
             break;  
         }
       }, false);
@@ -48,7 +74,7 @@ var app = {
 
   snake: {
     length: 3,
-    coordinates: {x: 100, y: 100},
+    coordinates: {x: 120, y: 120},
     speed: 10,
     history: [],
     init: function( ) {
@@ -100,8 +126,8 @@ var app = {
   },
 
   arena: {
-    height: 500,
-    width: 500,
+    height: 250,
+    width: 250,
     matrica: [],
     snake: null,
     init: function() {
@@ -111,6 +137,12 @@ var app = {
       this.matrica = this.generateMatrica();
 
       return this;
+    },
+    getWidth: function() {
+      return this.width;
+    },
+    getHeight: function() {
+      return this.height;
     },
     addSnake: function(snake) {
       this.snake = snake;
@@ -202,7 +234,6 @@ var app = {
       // Render snake.
       snakeCoordinates = arena.snake.getCoordinates();
       for (var i = 0; i < snakeCoordinates.length; i++) {
-        
         this.renderPixel(arena, snakeCoordinates[i]);
       };
 
