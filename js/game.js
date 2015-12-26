@@ -19,7 +19,7 @@ var app = {
   game: {
     intervalId: null,
     score: 0,
-    speed: 130,
+    speed: 100,
     start: function(arena) {
       app.game.intervalId = setInterval(function() {
         arena.snake.move();
