@@ -13,49 +13,46 @@ var app = {
 
     arena.addApple(apple);
     
-    app.game.live();
+    app.game.start(arena);
   },
 
   game: {
     intervalId: null,
     score: 0,
-    speed: 500,
-    live: function() {
-      app.arena.snake.move();
+    speed: 130,
+    start: function(arena) {
+      app.game.intervalId = setInterval(function() {
+        arena.snake.move();
 
-      // Check if snake over board
-      // Minus one pixel from border. One graph pixel is 10 pixels.
-      if (
-        app.arena.snake.getX() < 0 || app.arena.snake.getX() > app.arena.getWidth() - 1 * 10 || 
-        app.arena.snake.getY() < 0 || app.arena.snake.getY() > app.arena.getHeight() - 1 * 10
-        )
-      {
-        // Game end
-        app.game.stop(app.game.intervalId);
-        // app.game.restart(app.arena);
-      }
+        // Check if snake over board
+        // Minus one pixel from border. One graph pixel is 10 pixels.
+        if (
+          arena.snake.getX() < 0 || arena.snake.getX() > arena.getWidth() - 1 * 10 || 
+          arena.snake.getY() < 0 || arena.snake.getY() > arena.getHeight() - 1 * 10
+          )
+        {
+          // Game end
+          app.game.stop(app.game.intervalId);
+          // app.game.restart(arena);
+        }
 
-      // Render display
-      app.display.render( app.arena );
+        // Render display
+        app.display.render( app.arena );
 
-      // Check if snake eat apple
-      if (JSON.stringify(app.snake.getCoordinates()) == JSON.stringify(app.apple.getCoordinates()))
-      {
-        this.scrore++;
-        app.snake.length++;
-        this.speed = this.speed - 10;
-        console.log(this.speed);
+        // Check if snake eat apple
+        if (JSON.stringify(app.snake.getCoordinates()) == JSON.stringify(app.apple.getCoordinates()))
+        {
+          this.scrore++;
+          app.snake.length++;
+          app.game.speed = app.game.speed - 10;
 
-        // Put new apple on app.arena
-        app.apple.generateNewCoordinates();
-      }
-
-      // if (app.game.intervalId) setInterval(app.game.intervalId);
-      // app.game.intervalId = setInterval(app.game.live, this.speed);
-      console.log('timeout')
+          // Put new apple on arena
+          app.apple.generateNewCoordinates();
+        }
+      }, app.game.speed);
     },
     stop: function(intevalId) {
-      setInterval(intevalId);
+      clearInterval(intevalId);
     },
     restart: function(arena) {
       arena.snake.setPosition({x: 100, y: 100});
