@@ -44,7 +44,7 @@ var app = {
         {
           this.scrore++;
           app.snake.length++;
-          app.game.speed = app.game.speed - 10;
+          // app.game.speed = app.game.speed - 10;
 
           // Put new apple on arena
           app.apple.generateNewCoordinates();
@@ -104,7 +104,12 @@ var app = {
         x: (Math.round(Math.random() * ((app.arena.getWidth() - 10) / 10))) * 10,
         y: (Math.round(Math.random() * ((app.arena.getHeight() - 10) / 10))) * 10
       });
-      console.log(app.apple.getCoordinates());
+      // Check that apple is not "under" snake
+      for (var i = 0; i < app.snake.getHistory().length; i++)
+      {
+        if (app.apple.getCoordinates() == app.snake.getHistory()[i])
+          app.apple.generateNewCoordinates();
+      }
     }
   },
 
