@@ -19,10 +19,12 @@ var app = {
   game: {
     intervalId: null,
     score: 0,
-    speed: 100,
+    fps: 100,
     start: function(arena) {
       app.game.intervalId = setInterval(function() {
         arena.snake.move();
+        // Save the snake direction inside the snake ^^
+        app.snake.direction = app.input.direction;
 
         // Check if snake over board
         // Minus one pixel from border. One graph pixel is 10 pixels.
@@ -36,7 +38,7 @@ var app = {
           // app.game.restart(arena);
         }
 
-        // Check if snake eat hisself
+        // Check if snake eat himself
         if (arena.snake.eatHimSelf())
         {
           // Stop game
@@ -48,7 +50,7 @@ var app = {
         {
           app.game.score++;
           app.snake.length++;
-          // app.game.speed = app.game.speed - 10;
+          // app.snake.speed++;
 
           // Put new apple on arena
           app.apple.generateNewCoordinates();
@@ -57,7 +59,7 @@ var app = {
         // Render display
         app.display.render( app.arena );
         
-      }, app.game.speed);
+      }, app.game.fps);
     },
     stop: function(intevalId) {
       clearInterval(intevalId);
@@ -72,20 +74,21 @@ var app = {
     setEvents: function() {
       addEventListener('keydown', function(e) {
         switch(e.keyCode) {
-          case 38: 
-            if (app.input.direction != "down")
+          // Prevent to eat himself by going reverse direction
+          case 38: // up
+            if (app.snake.direction != 'down')
               app.input.direction = "up";
             break;
-          case 39: 
-            if (app.input.direction != "left")
+          case 39: // right
+            if (app.snake.direction != 'left')
               app.input.direction = "right";
             break;
-          case 40:
-            if (app.input.direction != "up")
+          case 40: // down
+            if (app.snake.direction != 'up')
               app.input.direction = "down";
             break;
-          case 37:
-            if (app.input.direction != "right")  
+          case 37: // left
+            if (app.snake.direction != 'right')
               app.input.direction = "left";
             break;  
         }
@@ -130,6 +133,7 @@ var app = {
     coordinates: {x: 120, y: 120},
     speed: 10,
     history: [],
+    direction: '',
     init: function( ) {
       // Safe first snake coordinate in history. 
       var firstStep = {x: this.getX(), y: this.getY()};
@@ -327,13 +331,11 @@ var app = {
     },
     renderPixel: function( arena, coordinates, color ) {
       this.ctx.beginPath();
-
       // Plus ten because of bordes
       this.ctx.rect(coordinates.x + 10, coordinates.y + 10, 10, 10);
-      this.ctx.closePath();
-
       this.ctx.fillStyle = color;
       this.ctx.fill();
+      this.ctx.closePath();
     },
     clearCanvas: function( arena ) {
       
