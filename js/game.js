@@ -17,54 +17,67 @@ var app = {
   },
 
   game: {
-    intervalId: null,
+    liveId: null,
     score: 0,
-    fps: 100,
-    start: function(arena) {
-      app.game.intervalId = setInterval(function() {
-        arena.snake.move();
-        // Save the snake direction inside the snake ^^
-        app.snake.direction = app.input.direction;
+    frequencyUpdate: 100,
+    run: true,
+    speed: 1,
+    live: function() {
+      app.arena.snake.move();
+      // Save the snake direction inside the snake ^^
+      app.snake.direction = app.input.direction;
 
-        // Check if snake over board
-        // Minus one pixel from border. One graph pixel is 10 pixels.
-        if (
-          arena.snake.getX() < 0 || arena.snake.getX() > arena.getWidth() - 1 * 10 || 
-          arena.snake.getY() < 0 || arena.snake.getY() > arena.getHeight() - 1 * 10
-          )
+      // Check if snake over board
+      // Minus one pixel from border. One graph pixel is 10 pixels.
+      if (
+        app.arena.snake.getX() < 0 || app.arena.snake.getX() > app.arena.getWidth() - 1 * 10 || 
+        app.arena.snake.getY() < 0 || app.arena.snake.getY() > app.arena.getHeight() - 1 * 10
+        )
+      {
+        // Game end
+        app.game.stop();
+        // app.game.restart(app.arena);
+      }
+
+      // Check if snake eat himself
+      if (app.arena.snake.eatHimSelf())
+      {
+        // Stop game
+        app.game.stop();
+      }
+
+      // Check if snake eat apple
+      if (JSON.stringify(app.snake.getCoordinates()) == JSON.stringify(app.apple.getCoordinates()))
+      {
+        app.game.score++;
+        app.snake.length++;
+        // Every 4 apples increase a speed
+        if (app.game.score % 4 == 0)
         {
-          // Game end
-          app.game.stop(app.game.intervalId);
-          // app.game.restart(arena);
+          app.game.speed++;
+          app.game.frequencyUpdate = app.game.frequencyUpdate - app.game.speed;
         }
 
-        // Check if snake eat himself
-        if (arena.snake.eatHimSelf())
-        {
-          // Stop game
-          app.game.stop(app.game.intervalId);
-        }
+        // Put new apple on arena
+        app.apple.generateNewCoordinates();
+      }
 
-        // Check if snake eat apple
-        if (JSON.stringify(app.snake.getCoordinates()) == JSON.stringify(app.apple.getCoordinates()))
-        {
-          app.game.score++;
-          app.snake.length++;
-          // app.snake.speed++;
+      // Render display
+      app.display.render( app.arena );
 
-          // Put new apple on arena
-          app.apple.generateNewCoordinates();
-        }
-
-        // Render display
-        app.display.render( app.arena );
-        
-      }, app.game.fps);
+      // Strange hack to determine a speed
+      setTimeout(function() {
+        if (app.game.run)
+          requestAnimationFrame(app.game.live);
+      }, app.game.frequencyUpdate);
     },
-    stop: function(intevalId) {
+    start: function(arena) {
+      requestAnimationFrame(app.game.live)
+    },
+    stop: function() {
       // alert("GAME OVER");
       // document.location.reload();
-      clearInterval(intevalId);
+      app.game.run = false;
     },
     restart: function(arena) {
       arena.snake.setPosition({x: 100, y: 100});
@@ -322,6 +335,8 @@ var app = {
       // Render count of ate apples
       this.renderCountOfAteApples(app.game.score);
 
+      // Render speed 
+      this.renderSpeed(app.game.speed);
       
       // this.arena.snake.history.each(function(i, el) {
       //   console.log(i, el)
@@ -346,6 +361,11 @@ var app = {
       this.ctx.font = '16px Serif';
       this.ctx.fillStyle = '#EEE';
       this.ctx.fillText('You ate ' + count + ' apples', 12, this.canvasHeight - 16);
+    },
+    renderSpeed: function(count) {
+      this.ctx.font = '16px Serif';
+      this.ctx.fillStyle = '#EEE';
+      this.ctx.fillText('Speed ' + count, 200, this.canvasHeight - 16);
     }
   },
 }
