@@ -62,9 +62,9 @@ var app = {
       }, app.game.fps);
     },
     stop: function(intevalId) {
-      alert("GAME OVER");
-      document.location.reload();
-      // clearInterval(intevalId);
+      // alert("GAME OVER");
+      // document.location.reload();
+      clearInterval(intevalId);
     },
     restart: function(arena) {
       arena.snake.setPosition({x: 100, y: 100});
