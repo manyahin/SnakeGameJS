@@ -36,6 +36,14 @@ var app = {
           // app.game.restart(arena);
         }
 
+        // Check if snake eat hisself
+        if (arena.snake.eatHimSelf())
+        {
+          // Stop game
+          app.game.stop(app.game.intervalId);
+        }
+
+
         // Render display
         app.display.render( app.arena );
 
@@ -105,9 +113,13 @@ var app = {
         y: (Math.round(Math.random() * ((app.arena.getHeight() - 10) / 10))) * 10
       });
       // Check that apple is not "under" snake
+      // Yes, I know, it is bad way
       for (var i = 0; i < app.snake.getHistory().length; i++)
       {
-        if (app.apple.getCoordinates() == app.snake.getHistory()[i])
+        if (
+          app.apple.getCoordinates().x == app.snake.getHistory()[i].x &&
+          app.apple.getCoordinates().y == app.snake.getHistory()[i].y
+          )
           app.apple.generateNewCoordinates();
       }
     }
@@ -120,7 +132,8 @@ var app = {
     history: [],
     init: function( ) {
       // Safe first snake coordinate in history. 
-      this.history.push(this.coordinates);
+      var firstStep = {x: this.getX(), y: this.getY()};
+      this.history.push(firstStep);
 
       return this;
     },
@@ -156,7 +169,7 @@ var app = {
       // Hack, push every time new object to history.
       this.history.push({x: this.getX(), y: this.getY()});
 
-      // Remove not used coordinates.
+      // Remove a tail of the snake 
       if (this.history.length > this.length) {
         this.history.shift();
       }
@@ -166,6 +179,12 @@ var app = {
     },
     getCoordinates: function() {
       return this.coordinates;
+    },
+    eatHimSelf: function() {
+      // Remove a head from the history
+      var coordinates = _.initial(this.history)
+      // Check if a head on same coordinates that a body
+      return _.filter(coordinates, this.coordinates).length > 0;
     }
   },
 
