@@ -43,20 +43,20 @@ var app = {
           app.game.stop(app.game.intervalId);
         }
 
-
-        // Render display
-        app.display.render( app.arena );
-
         // Check if snake eat apple
         if (JSON.stringify(app.snake.getCoordinates()) == JSON.stringify(app.apple.getCoordinates()))
         {
-          this.scrore++;
+          app.game.score++;
           app.snake.length++;
           // app.game.speed = app.game.speed - 10;
 
           // Put new apple on arena
           app.apple.generateNewCoordinates();
         }
+
+        // Render display
+        app.display.render( app.arena );
+        
       }, app.game.speed);
     },
     stop: function(intevalId) {
@@ -238,32 +238,37 @@ var app = {
   display: {
     canvas: {},
     ctx: {},
+    canvasHeight: 0,
+    canvasWidth: 0,
     renderCanvas: function( arena ) {
+
+      this.canvasHeight = arena.height + 50;
+      this.canvasWidth = arena.width + 20;
+
       // Create the canvas
       if (this.canvas.toString() 
         != "[object HTMLCanvasElement]") {
         this.canvas = document.createElement("canvas");
-        this.canvas.style.border = "3px solid black";
+        // this.canvas.style.border = "3px solid black";
         this.ctx = this.canvas.getContext("2d");
-        this.canvas.width = arena.height;
-        this.canvas.height = arena.width;
+        this.canvas.width = this.canvasWidth;
+        this.canvas.height = this.canvasHeight;
         document.body.appendChild(this.canvas);
       }
 
-      this.ctx.clearRect(0, 0, arena.width, arena.width);
-      // color in the background
-      this.ctx.fillStyle = "black";
-      this.ctx.fillRect(0, 0, arena.width, arena.width);
+      // Clear everything
+      this.ctx.clearRect(0, 0, this.canvasWidth, this.canvasHeight);
+      
+      // Fill everything in black
+      this.ctx.fillStyle = "#000000";
+      this.ctx.fillRect(0, 0, this.canvasWidth, this.canvasHeight);
 
-      // console.log(this.ctx)
-      // Paint it black.
+      // Fill the backgorund in yellow color
       this.ctx.fillStyle = "#FFBB22";
-      this.ctx.rect(0, 0, arena.width, arena.height);
-      this.ctx.fill();
+      this.ctx.fillRect(10, 10, arena.width, arena.height);
 
       // Save the initial background.
       // this.back = this.ctx.getImageData(0, 0, 30, 30);
-
     },
     renderHtmlTable: function( arena ) {
       $('.arena').html(' ');
@@ -308,6 +313,9 @@ var app = {
         this.renderPixel(arena, snakeCoordinates[i], 'green');
       };
 
+      // Render count of ate apples
+      this.renderCountOfAteApples(app.game.score);
+
       
       // this.arena.snake.history.each(function(i, el) {
       //   console.log(i, el)
@@ -320,14 +328,20 @@ var app = {
     renderPixel: function( arena, coordinates, color ) {
       this.ctx.beginPath();
 
-      this.ctx.rect(coordinates.x, coordinates.y, 10, 10);
+      // Plus ten because of bordes
+      this.ctx.rect(coordinates.x + 10, coordinates.y + 10, 10, 10);
       this.ctx.closePath();
 
       this.ctx.fillStyle = color;
-      this.ctx.fill();      
+      this.ctx.fill();
     },
     clearCanvas: function( arena ) {
       
+    },
+    renderCountOfAteApples: function(count) {
+      this.ctx.font = '16px Serif';
+      this.ctx.fillStyle = '#EEE';
+      this.ctx.fillText('You ate ' + count + ' apples', 12, this.canvasHeight - 16);
     }
   },
 }
