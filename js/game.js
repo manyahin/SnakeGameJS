@@ -183,8 +183,8 @@ var app = {
     eatHimSelf: function() {
       // Remove a head from the history
       var coordinates = _.initial(this.history)
-      // Check if a head on same coordinates that a body
-      return _.filter(coordinates, this.coordinates).length > 0;
+      // Check if a head on same coordinates that the snake
+      return _.some(coordinates, this.coordinates);
     }
   },
 
